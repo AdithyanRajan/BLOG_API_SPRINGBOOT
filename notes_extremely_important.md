@@ -184,33 +184,6 @@ If it's a class like a service class and when we do @Service, Spring directly cr
 To use methods like .orElse or .orElseThrow the return type should be Option<class_name>
 
 4) 
-OpenApiConfig.java
-(Optional) Configures Swagger/OpenAPI for authorization header input (helpful for testing secured endpoints).
-
-SecurityConfig.java
-Core of Spring Security config.
-Enables JWT filter, disables session management, configures which endpoints require authentication.
-
-AuthController.java
-Exposes /login or /authenticate endpoint to accept username & password and return JWT.
-
-CustomUserDetails.java
-Wraps your User entity to implement UserDetails for Spring Security.
-
-CustomUserDetailsService.java
-Loads user from DB (via UserRepository) and returns a CustomUserDetails object.
-
-JwtAuthenticationFilter.java
-Intercepts requests, extracts JWT from header, validates it, sets authentication in the security context.
-
-JwtTokenHelper.java
-Generates, parses, and validates JWT tokens.
-
-JwtAuthRequest.java
-DTO: used to receive login credentials (username & password).
-
-JwtAuthResponse.java
-DTO: used to send back the JWT token after successful login.
 
 Order:
 1. CustomUserDetails ✅
@@ -221,3 +194,44 @@ Order:
 6. SecurityConfig
 7. JwtAuthenticationFilter
 8. OpenApiConfig (optional)
+
+- - - - - - - - - -
+5) 
+you have something like
+
+@RequiredArgsConstructor
+public class Authcontroller{
+    private final AuthenticationManager authenticationmanager
+}
+here because it's private final and then also @requiredargsconstructor spring automatically creates a constructor and spring takes the bean object and injects it's value to authenticationmanager
+
+6) 
+what @bean does, it says to spring hey hey spring this method bundle up and create instance of it, we gonna need it 
+Spring scans your @Configuration class.
+
+It finds your @Bean method.
+
+It invokes the method to get the object (e.g., a new PasswordEncoder()).
+
+Spring stores this object in its application context as a managed bean.
+
+Whenever you need this bean elsewhere, Spring injects the same instance (singleton by default).
+
+Yes, Spring calls all @Bean methods automatically at startup to create and register those beans in the application context.
+
+What if the @Bean method has parameters?
+Spring will try to resolve the parameters by dependency injection.
+
+What if parameters cannot be resolved (e.g., user input)?
+Spring cannot provide parameters based on user input at startup.
+
+@Bean methods are meant for creating infrastructure beans, configured via other beans or properties — not for runtime user input.
+
+So:
+You cannot pass runtime/user input directly to @Bean methods.
+
+For dynamic or user-specific data, you use other mechanisms:
+
+Pass inputs to methods of the bean after it’s created
+
+Use Spring-managed services or controllers that accept user input at runtime
